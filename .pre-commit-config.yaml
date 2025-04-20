@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.11.6
+    hooks:
+      # Run the linter.
+      - id: ruff
+        args: [ --fix ]
+      # Run the formatter.
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: poetry-check
+        name: Poetry Check
+        entry: poetry check
+        language: system
+        types: [python]
+
+      - id: poetry-lock
+        name: Poetry Lock (validate lock file)
+        entry: poetry lock --check
+        language: system
+        types: [python]

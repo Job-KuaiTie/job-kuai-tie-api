@@ -9,16 +9,25 @@ repos:
       # Run the formatter.
       - id: ruff-format
 
-  - repo: local
-    hooks:
-      - id: poetry-check
-        name: Poetry Check
-        entry: poetry check
-        language: system
-        types: [python]
+  # - repo: local
+  #   hooks:
+  #     - id: poetry-check
+  #       name: Poetry Check
+  #       entry: poetry check
+  #       language: system
+  #       types: [python]
 
-      - id: poetry-lock
-        name: Poetry Lock (validate lock file)
-        entry: poetry lock --check
-        language: system
-        types: [python]
+  #     - id: poetry-lock
+  #       name: Poetry Lock (validate lock file)
+  #       entry: poetry lock --check
+  #       language: system
+  #       types: [python]
+  - repo: https://github.com/python-poetry/poetry
+    rev: 2.1.2
+    hooks:
+    -   id: poetry-check
+    -   id: poetry-lock
+    # No need if no need to sync requirements.txt
+    # -   id: poetry-export
+    # No need for solo project now
+    # -   id: poetry-install

@@ -1,0 +1,17 @@
+[project]
+name = "fast-api-demo-104"
+version = "0.1.0"
+description = "This project is a demo project for 104 interview, which mainly targeting FastAPI exploration."
+authors = [
+    {name = "Huang Chuan",email = "river1440"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi (>=0.115.12,<0.116.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

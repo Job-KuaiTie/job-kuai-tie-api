@@ -4,7 +4,7 @@ from typing import Annotated
 # from pydantic import BaseModel
 # from fastapi import FastAPI, Query, Header
 from fastapi import FastAPI, Depends, HTTPException, Query
-from sqlmodel import Session, create_engine, SQLModel, select
+from sqlmodel import Session, create_engine, select
 from model import Hero, HeroCreate, HeroPublic, HeroUpdate
 
 # from typing import Annotated
@@ -19,10 +19,6 @@ connect_args = {"check_same_thread": False}
 engine = create_engine(sqlite_url, connect_args=connect_args)
 
 
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
-
-
 def get_session():
     with Session(engine) as session:
         yield session
@@ -31,11 +27,6 @@ def get_session():
 SessionDep = Annotated[Session, Depends(get_session)]
 
 app = FastAPI()
-
-
-@app.on_event("startup")
-def on_startup():
-    create_db_and_tables()
 
 
 # Get session from SessionDep, which define above to provide connection to database

@@ -6,7 +6,7 @@ from logging.config import fileConfig
 from sqlmodel import SQLModel
 
 # from model import Hero
-from main import engine
+from app.main import engine
 
 from alembic import context
 

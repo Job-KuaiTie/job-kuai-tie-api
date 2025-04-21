@@ -25,4 +25,9 @@ RUN poetry config virtualenvs.create false && \
 # Set workdir and copy project files
 COPY . .
 
-CMD ["fastapi", "run", "app/main.py", "--port", "8088"]
+# Expose port (optional, helps with clarity and docs)
+EXPOSE 8088
+
+# CMD ["fastapi", "run", "app/main.py", "--port", "8088"]
+# Use uvicorn to serve FastAPI
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8088"]

@@ -1,67 +1,74 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
-
+from datetime import datetime, timezone
 from app.db import SessionDep
-from app.model import Hero, HeroCreate, HeroPublic, HeroUpdate
+from app.model import Account, AccountCreate, AccountPublic, AccountUpdate
+from app.core import hash_password
 
 router = APIRouter()
 
 
-@router.post("/heroes/", response_model=HeroPublic)
-def create_hero(hero: HeroCreate, session: SessionDep):
-    db_hero = Hero.model_validate(hero)
-    session.add(db_hero)
+@router.post("/accounts/", response_model=AccountPublic)
+def create_account(account: AccountCreate, session: SessionDep):
+    db_account = Account(
+        name=account.name,
+        email=account.email,
+        password_hash=hash_password(account.password),
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+    session.add(db_account)
     session.commit()
-    session.refresh(db_hero)
-    return db_hero
+    session.refresh(db_account)
+    return db_account
 
 
-@router.get("/heroes/", response_model=list[HeroPublic])
-def read_heroes(
+@router.get("/accounts/", response_model=list[AccountPublic])
+def read_accounts(
     session: SessionDep,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
-) -> list[Hero]:
-    heroes = session.exec(select(Hero).offset(offset).limit(limit)).all()
-    return heroes
+) -> list[Account]:
+    accounts = session.exec(select(Account).offset(offset).limit(limit)).all()
+    return accounts
 
 
-@router.get("/heroes/{hero_id}", response_model=HeroPublic)
-def read_hero(hero_id: int, session: SessionDep) -> Hero:
-    hero = session.get(Hero, hero_id)
-    if not hero:
-        raise HTTPException(status_code=404, detail="Hero not found")
-    return hero
+@router.get("/accounts/{account_id}", response_model=AccountPublic)
+def read_account(account_id: int, session: SessionDep) -> Account:
+    account = session.get(Account, account_id)
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    return account
 
 
-@router.patch("/heroes/{hero_id}", response_model=HeroPublic)
-def update_hero(hero_id: int, hero: HeroUpdate, session: SessionDep):
-    hero_db = session.get(Hero, hero_id)
-    if not hero_db:
-        raise HTTPException(status_code=404, detail="Hero not found")
-    hero_data = hero.model_dump(exclude_unset=True)
+@router.patch("/accounts/{account_id}", response_model=AccountPublic)
+def update_account(account_id: int, account: AccountUpdate, session: SessionDep):
+    account_db = session.get(Account, account_id)
+    if not account_db:
+        raise HTTPException(status_code=404, detail="Account not found")
+    account_data = account.model_dump(exclude_unset=True)
 
     # PydanticDeprecatedSince211: Accessing the 'model_fields' attribute on the instance is deprecated.
     # Instead, you should access this attribute from the model class.
     # Deprecated in Pydantic V2.11 to be removed in V3.0.
-    # hero_db.sqlmodel_update(hero_data)
+    # account_db.sqlmodel_update(account_data)
 
-    for key, value in hero_data.items():
-        setattr(hero_db, key, value)
+    for key, value in account_data.items():
+        setattr(account_db, key, value)
 
-    session.add(hero_db)
+    session.add(account_db)
     session.commit()
-    session.refresh(hero_db)
-    return hero_db
+    session.refresh(account_db)
+    return account_db
 
 
-@router.delete("/heroes/{hero_id}")
-def delete_hero(hero_id: int, session: SessionDep):
-    hero = session.get(Hero, hero_id)
-    if not hero:
-        raise HTTPException(status_code=404, detail="Hero not found")
-    session.delete(hero)
+@router.delete("/accounts/{account_id}")
+def delete_account(account_id: int, session: SessionDep):
+    account = session.get(Account, account_id)
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    session.delete(account)
     session.commit()
     return {"ok": True}
 

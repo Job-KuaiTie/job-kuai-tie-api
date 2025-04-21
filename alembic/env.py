@@ -29,6 +29,10 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
+
+# Even though SQLModel.metadata is the target
+# the models must be imported and registered in Python before Alembic runs autogenerate.
+
 target_metadata = SQLModel.metadata
 
 # other values from the config, defined by the needs of env.py,

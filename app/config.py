@@ -7,7 +7,7 @@ from typing import Optional
 class Settings(BaseSettings):
     database_url: Optional[str] = Field(default=None, alias="DB_URL")
 
-    db_type: Optional[str] = Field(default=None, alias="DB_TYPE")
+    db_type: str = Field(default="sqlite", alias="DB_TYPE")
     db_user: Optional[str] = Field(default=None, alias="DB_USER")
     db_password: Optional[str] = Field(default=None, alias="DB_PASSWORD")
     db_host: Optional[str] = Field(default=None, alias="DB_HOST")
@@ -23,7 +23,7 @@ class Settings(BaseSettings):
         if self.db_user and self.db_password and self.db_host and self.db_name:
             # Only support mysql now
             if self.db_type == "mysql":
-                return f"mysql+pymysql://://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+                return f"mysql+pymysql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
         # If directly provide db_url
         elif self.database_url:
             return self.database_url

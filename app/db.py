@@ -4,7 +4,11 @@ from sqlmodel import Session, create_engine
 
 from app.config import settings
 
-connect_args = {"check_same_thread": False}
+connect_args = {}
+
+if settings.db_type == "sqlite":
+    connect_args = {"check_same_thread": False}
+
 engine = create_engine(settings.db_url, connect_args=connect_args)
 
 

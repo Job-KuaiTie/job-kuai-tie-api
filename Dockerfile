@@ -1,25 +1,28 @@
-### Stage 1: Builder ###
-FROM python:3.13-slim AS builder
+FROM python:3.13-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV PATH="/root/.local/bin:$PATH"
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/root/.local/bin:$PATH" \
+    POETRY_VERSION=2.1.2
 
-# Install pipx & poetry
-RUN pip install pipx && pipx ensurepath
-RUN pipx install poetry && pipx inject poetry poetry-plugin-bundle
+# Install pipx and poetry
+RUN pip install --no-cache-dir pipx && \
+    pipx ensurepath && \
+    pipx install poetry==${POETRY_VERSION}
+
+# Set work directory
+WORKDIR /app
+
+# Copy only dependency files first (for Docker layer caching)
+COPY pyproject.toml poetry.lock ./
+
+
+# Install dependencies (main only, no dev, no building this package)
+RUN poetry config virtualenvs.create false && \
+    poetry install --only main --no-root --no-interaction --no-ansi
 
 # Set workdir and copy project files
-WORKDIR /app
 COPY . .
 
-# Explicitly specify the Python version to use in poetry bundle venv
-RUN poetry bundle venv /venv --python /usr/local/bin/python3 --only=main
-
-### Stage 2: Runtime ###
-FROM gcr.io/distroless/python3-debian12
-
-# Copy the venv and use its binary as entrypoint
-COPY --from=builder /venv /venv
-
-ENTRYPOINT ["/venv/bin/uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "run", "app/main.py", "--port", "8088"]

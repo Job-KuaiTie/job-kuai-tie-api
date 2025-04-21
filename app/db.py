@@ -6,6 +6,7 @@ from app.config import settings
 
 connect_args = {}
 
+# In SQLAlchemy, check_same_thread is a SQLite-specific setting:
 if settings.db_type == "sqlite":
     connect_args = {"check_same_thread": False}
 

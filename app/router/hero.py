@@ -1,12 +1,14 @@
 from typing import Annotated
-from fastapi import HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
 
-from app.main import app, SessionDep
+from app.db import SessionDep
 from app.model import Hero, HeroCreate, HeroPublic, HeroUpdate
 
+router = APIRouter()
 
-@app.post("/heroes/", response_model=HeroPublic)
+
+@router.post("/heroes/", response_model=HeroPublic)
 def create_hero(hero: HeroCreate, session: SessionDep):
     db_hero = Hero.model_validate(hero)
     session.add(db_hero)
@@ -15,7 +17,7 @@ def create_hero(hero: HeroCreate, session: SessionDep):
     return db_hero
 
 
-@app.get("/heroes/", response_model=list[HeroPublic])
+@router.get("/heroes/", response_model=list[HeroPublic])
 def read_heroes(
     session: SessionDep,
     offset: int = 0,
@@ -25,7 +27,7 @@ def read_heroes(
     return heroes
 
 
-@app.get("/heroes/{hero_id}", response_model=HeroPublic)
+@router.get("/heroes/{hero_id}", response_model=HeroPublic)
 def read_hero(hero_id: int, session: SessionDep) -> Hero:
     hero = session.get(Hero, hero_id)
     if not hero:
@@ -33,20 +35,28 @@ def read_hero(hero_id: int, session: SessionDep) -> Hero:
     return hero
 
 
-@app.patch("/heroes/{hero_id}", response_model=HeroPublic)
+@router.patch("/heroes/{hero_id}", response_model=HeroPublic)
 def update_hero(hero_id: int, hero: HeroUpdate, session: SessionDep):
     hero_db = session.get(Hero, hero_id)
     if not hero_db:
         raise HTTPException(status_code=404, detail="Hero not found")
     hero_data = hero.model_dump(exclude_unset=True)
-    hero_db.sqlmodel_update(hero_data)
+
+    # PydanticDeprecatedSince211: Accessing the 'model_fields' attribute on the instance is deprecated.
+    # Instead, you should access this attribute from the model class.
+    # Deprecated in Pydantic V2.11 to be removed in V3.0.
+    # hero_db.sqlmodel_update(hero_data)
+
+    for key, value in hero_data.items():
+        setattr(hero_db, key, value)
+
     session.add(hero_db)
     session.commit()
     session.refresh(hero_db)
     return hero_db
 
 
-@app.delete("/heroes/{hero_id}")
+@router.delete("/heroes/{hero_id}")
 def delete_hero(hero_id: int, session: SessionDep):
     hero = session.get(Hero, hero_id)
     if not hero:
@@ -80,22 +90,22 @@ def delete_hero(hero_id: int, session: SessionDep):
 #     x_tag: list[str] = []
 
 
-# @app.get("/header_demo/")
+# @router.get("/header_demo/")
 # async def header_demo(headers: Annotated[CommonHeaders, Header()]):
 #     return headers
 
 
-# @app.get("/")
+# @router.get("/")
 # async def root():
 #     return {"message": "Hello World"}
 
 
-# @app.get("/items/{item_id}")
+# @router.get("/items/{item_id}")
 # async def read_item(item_id: int):
 #     return {"item_id": item_id}
 
 
-# @app.get("/items_with_return/")
+# @router.get("/items_with_return/")
 # async def read_items_with_return() -> list[Item]:
 #     return [
 #         Item(name="Portal Gun", price=42.0),
@@ -103,17 +113,17 @@ def delete_hero(hero_id: int, session: SessionDep):
 #     ]
 
 
-# @app.get("/users/me")
+# @router.get("/users/me")
 # async def read_user_me():
 #     return {"user_id": "the current user"}
 
 
-# @app.get("/users/{user_id}")
+# @router.get("/users/{user_id}")
 # async def read_user(user_id: str):
 #     return {"user_id": user_id}
 
 
-# @app.get("/models/{model_name}")
+# @router.get("/models/{model_name}")
 # async def get_model(model_name: ModelName):
 #     if model_name is ModelName.alexnet:
 #         return {"model_name": model_name, "message": "Deep Learning FTW!"}
@@ -127,12 +137,12 @@ def delete_hero(hero_id: int, session: SessionDep):
 # fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
 
 
-# # @app.get("/items/")
+# # @router.get("/items/")
 # # async def read_item(skip: int = 0, limit: int = 10):
 # #     return fake_items_db[skip : skip + limit]
 
 
-# @app.get("/items/")
+# @router.get("/items/")
 # async def read_items(
 #     q: Annotated[str | None, Query(min_length=3, max_length=50)] = None,
 # ):
@@ -142,7 +152,7 @@ def delete_hero(hero_id: int, session: SessionDep):
 #     return results
 
 
-# @app.post("/items/")
+# @router.post("/items/")
 # async def create_item(item: Item):
 #     item_dict = item.dict()
 #     if item.tax is not None:

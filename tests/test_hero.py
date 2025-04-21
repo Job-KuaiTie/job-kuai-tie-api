@@ -4,14 +4,19 @@ from app.main import app
 client = TestClient(app)
 
 
+def test_root():
+    response = client.get("/")
+    assert response.status_code == 200
+
+
 def test_create_hero():
+    name = "Test Hero"
     response = client.post(
-        "/heroes/", json={"name": "Test Hero", "age": 30, "secret_name": "Secret"}
+        "/heroes/", json={"name": name, "age": 30, "secret_name": "Secret"}
     )
     assert response.status_code == 200
     data = response.json()
-    breakpoint()
-    assert data["name"] == "Test Hero"
+    assert data["name"] == name
     assert "id" in data
 
 

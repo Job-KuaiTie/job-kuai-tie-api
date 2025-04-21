@@ -35,7 +35,7 @@ def read_accounts(
 
 
 @router.get("/accounts/{account_id}", response_model=AccountPublic)
-def read_account(account_id: int, session: SessionDep) -> Account:
+def read_account(account_id: str, session: SessionDep) -> Account:
     account = session.get(Account, account_id)
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
@@ -43,7 +43,7 @@ def read_account(account_id: int, session: SessionDep) -> Account:
 
 
 @router.patch("/accounts/{account_id}", response_model=AccountPublic)
-def update_account(account_id: int, account: AccountUpdate, session: SessionDep):
+def update_account(account_id: str, account: AccountUpdate, session: SessionDep):
     account_db = session.get(Account, account_id)
     if not account_db:
         raise HTTPException(status_code=404, detail="Account not found")
@@ -55,7 +55,9 @@ def update_account(account_id: int, account: AccountUpdate, session: SessionDep)
     # account_db.sqlmodel_update(account_data)
 
     for key, value in account_data.items():
-        setattr(account_db, key, value)
+        # SHould not change email at this stage
+        if key != "email":
+            setattr(account_db, key, value)
 
     session.add(account_db)
     session.commit()
@@ -64,7 +66,7 @@ def update_account(account_id: int, account: AccountUpdate, session: SessionDep)
 
 
 @router.delete("/accounts/{account_id}")
-def delete_account(account_id: int, session: SessionDep):
+def delete_account(account_id: str, session: SessionDep):
     account = session.get(Account, account_id)
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")

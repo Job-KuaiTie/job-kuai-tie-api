@@ -21,7 +21,7 @@ class EntityMixin(EntityBase):
 
 # Get
 class EntityPublicMixin(EntityBase):
-    id: int
+    id: str
     created_at: datetime
     updated_at: datetime
 

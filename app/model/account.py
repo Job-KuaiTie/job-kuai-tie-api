@@ -26,6 +26,5 @@ class AccountCreate(AccountBase):
 
 
 class AccountUpdate(EntityUpdateMixin, AccountBase):
-    # Cound not change email in this stage
-    # email: EmailStr | None = None
+    email: EmailStr | None = None
     password: str | None = None

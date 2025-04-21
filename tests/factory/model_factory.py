@@ -62,7 +62,7 @@ class CompanyFactory(ResourceFactory, factory.Factory):
         model = Company
 
     # Optional
-    url = factory.LazyAttribute(lambda o: fake.url if o.optional else None)
+    url = factory.LazyAttribute(lambda o: fake.url() if o.optional else None)
     size = factory.LazyAttribute(
         lambda o: fake.random_int(min=1, max=1000000) if o.optional else None
     )
@@ -81,7 +81,7 @@ class JobFactory(ResourceFactory, factory.Factory):
     applied_at = factory.LazyAttribute(
         lambda o: fake.date_time() if o.optional else None
     )
-    url = factory.LazyAttribute(lambda o: fake.url if o.optional else None)
+    url = factory.LazyAttribute(lambda o: fake.url() if o.optional else None)
     min_yearly_salary = factory.LazyAttribute(
         lambda o: fake.random_int(min=200000, max=100000000) if o.optional else None
     )

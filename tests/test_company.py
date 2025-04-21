@@ -1,14 +1,17 @@
 class TestCompany:
     def test_create_company(self, client, default_account):
-        url = "https://thisisacoolcompany.com"
+        name = "This is a chill company"
+        url = "https://thisisachillcompany.com/"
         size = 20
-        owner_id = default_account
+        owner_id = default_account.id
 
         response = client.post(
-            "/companies/", json={"url": url, "size": size, "owner_id": owner_id}
+            "/companies/",
+            json={"name": name, "url": url, "size": size, "owner_id": owner_id},
         )
         assert response.status_code == 200
         data = response.json()
+        assert data["name"] == name
         assert data["url"] == url
         assert data["size"] == size
         assert data["owner_id"] == owner_id
@@ -38,7 +41,10 @@ class TestCompany:
         new_name = "This is new name"
 
         # Act: Update it
-        patch = client.patch(f"/companies/{company_id}", json={"name": new_name})
+        patch = client.patch(
+            f"/companies/{company_id}",
+            json={"name": new_name, "owner_id": default_company.owner_id},
+        )
         assert patch.status_code == 200
         assert patch.json()["name"] == new_name
 

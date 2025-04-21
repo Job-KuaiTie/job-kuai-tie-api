@@ -1,5 +1,5 @@
 from sqlmodel import Field, SQLModel
-from datetime import datetime
+from datetime import datetime, timezone
 from nanoid import generate
 
 
@@ -15,8 +15,12 @@ class EntityBase(SQLModel):
 # In database
 class EntityMixin(EntityBase):
     id: str | None = Field(default_factory=generate_nanoid, primary_key=True)
-    created_at: datetime
-    updated_at: datetime
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc), nullable=False
+    )
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc), nullable=False
+    )
 
 
 # Get

@@ -48,7 +48,6 @@ def default_company(session: Session, default_account: Account):
     session.add(company)
     session.commit()
     session.refresh(company)
-
     yield company
 
 

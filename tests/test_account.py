@@ -1,15 +1,4 @@
 class TestAccount:
-    def _create_account(
-        self,
-        client,
-        name: str = "Test Account",
-        email: str = "test@gmail.com",
-        password: str = "top_s1cret",
-    ):
-        return client.post(
-            "/accounts/", json={"name": name, "email": email, "password": password}
-        )
-
     def test_root(self, client):
         response = client.get("/")
         assert response.status_code == 200
@@ -19,8 +8,8 @@ class TestAccount:
         email = "test01@gmail.com"
         password = "top_s1cret_01"
 
-        response = self._create_account(
-            client=client, name=name, email=email, password=password
+        response = client.post(
+            "/accounts/", json={"name": name, "email": email, "password": password}
         )
         assert response.status_code == 200
         data = response.json()
@@ -34,34 +23,20 @@ class TestAccount:
         assert response.status_code == 200
         assert isinstance(response.json(), list)
 
-    def test_read_account(self, client):
-        # Arrange: Create one first
-        name = "For test_read_account 02"
-        email = "test02@gmail.com"
-        password = "top_s1cret_02"
-
-        post = self._create_account(
-            client=client, name=name, email=email, password=password
-        )
-        account_id = post.json()["id"]
+    def test_read_account(self, client, default_account):
+        # Arrange: Get the account id
+        account_id = default_account.id
 
         # Act: Read it back
         response = client.get(f"/accounts/{account_id}")
 
         # Assert: Check if the value as expected
         assert response.status_code == 200
-        assert response.json()["name"] == name
+        assert response.json()["name"] == default_account.name
 
-    def test_update_account(self, client):
-        # Arrange: Create one first
-        name = "For test_update_account 03"
-        email = "test03@gmail.com"
-        password = "top_s1cret_03"
-
-        post = self._create_account(
-            client=client, name=name, email=email, password=password
-        )
-        account_id = post.json()["id"]
+    def test_update_account(self, client, default_account):
+        # Arrange: Get the account id
+        account_id = default_account.id
 
         # Arrange: Set new name
         new_name = "This is new name"
@@ -71,16 +46,9 @@ class TestAccount:
         assert patch.status_code == 200
         assert patch.json()["name"] == new_name
 
-    def test_delete_account(self, client):
-        # Arrange: Create one first
-        name = "For test_delete_account 04"
-        email = "test04@gmail.com"
-        password = "top_s1cret_04"
-
-        post = self._create_account(
-            client=client, name=name, email=email, password=password
-        )
-        account_id = post.json()["id"]
+    def test_delete_account(self, client, default_account):
+        # Arrange: Get the account id
+        account_id = default_account.id
 
         # Act: Delete it
         delete = client.delete(f"/accounts/{account_id}")

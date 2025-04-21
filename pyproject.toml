@@ -36,6 +36,8 @@ optional = true
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.5"
+factory-boy = "^3.3.3"
+faker = "^37.1.0"
 
 [tool.pytest.ini_options]
 addopts = [

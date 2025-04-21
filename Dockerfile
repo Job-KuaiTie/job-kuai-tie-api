@@ -28,6 +28,6 @@ COPY . .
 # Expose port (optional, helps with clarity and docs)
 EXPOSE 8088
 
-# CMD ["fastapi", "run", "app/main.py", "--port", "8088"]
-# Use uvicorn to serve FastAPI
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8088"]
+# Copy and set entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]

@@ -67,7 +67,11 @@ def update_job(
     # job_db.sqlmodel_update(job_data)
 
     for key, value in job_data.items():
-        setattr(job_db, key, value)
+        if key == "url":
+            url = str(value) if value else None
+            setattr(job_db, key, url)
+        else:
+            setattr(job_db, key, value)
 
     session.add(job_db)
     session.commit()

@@ -18,6 +18,20 @@ class TestAccount:
         assert "password" not in data
         assert "id" in data
 
+    def test_create_account_with_same_email(self, client, default_account):
+        # Arrange: Provide the attr
+        name = "First"
+        email = default_account.email
+        password = "first_secret"
+
+        # Act: Create an account with same email with the default account
+        response = client.post(
+            "/accounts/", json={"name": name, "email": email, "password": password}
+        )
+
+        # Assert: It should fails with 404
+        assert response.status_code == 404
+
     def test_read_accounts(self, client):
         response = client.get("/accounts/")
         assert response.status_code == 200

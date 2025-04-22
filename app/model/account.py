@@ -4,7 +4,7 @@ from pydantic import EmailStr
 
 
 class AccountBase(EntityBase):
-    email: str = Field(index=True)
+    email: str = Field(index=True, unique=True)
 
 
 class Account(EntityMixin, AccountBase, table=True):

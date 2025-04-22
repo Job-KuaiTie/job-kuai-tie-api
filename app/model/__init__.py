@@ -1,3 +1,4 @@
+from .token import Token, TokenData
 from .account import Account, AccountCreate, AccountPublic, AccountUpdate
 from .company import Company, CompanyCreate, CompanyPublic, CompanyUpdate
 from .job import Job, JobCreate, JobPublic, JobUpdate
@@ -7,6 +8,8 @@ from .job_category import JobCategoryLink
 
 # Define __all__ to specify the public interface
 __all__ = [
+    "Token",
+    "TokenData",
     "Account",
     "AccountCreate",
     "AccountPublic",

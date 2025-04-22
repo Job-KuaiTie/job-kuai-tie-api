@@ -6,7 +6,7 @@ from app.model import (
     Category,
     # JobCategoryLink,
 )
-from app.core import hash_password
+from app.security import hash_password
 from datetime import datetime, timezone
 from nanoid import generate
 from faker import Faker

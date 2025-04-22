@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
 from app.db import SessionDep
 from app.model import Account, AccountCreate, AccountPublic, AccountUpdate
-from app.core import hash_password
+from app.security import hash_password, get_account_by_email
 
 router = APIRouter(
     prefix="/accounts",
@@ -13,9 +13,15 @@ router = APIRouter(
 
 @router.post("/", response_model=AccountPublic)
 def create_account(account: AccountCreate, session: SessionDep):
+    account_email = account.email
+    if get_account_by_email(account_email, session) is not None:
+        # In the future, it should be no matter email existed or not, send confirmation email.
+        # To aovid guessing email by malicious user.
+        raise HTTPException(status_code=404, detail="Email is registered.")
+
     db_account = Account(
         name=account.name,
-        email=account.email,
+        email=account_email,
         password_hash=hash_password(account.password),
     )
     session.add(db_account)

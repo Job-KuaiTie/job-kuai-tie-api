@@ -86,7 +86,7 @@ class JobFactory(ResourceFactory, factory.Factory):
         lambda o: fake.random_int(min=200000, max=100000000) if o.optional else None
     )
     max_yearly_salary = factory.LazyAttribute(
-        lambda o: (o.min_yearly_return_rate + fake.random_int(min=0, max=1000000))
+        lambda o: (o.min_yearly_salary + fake.random_int(min=0, max=1000000))
         if o.optional
         else None
     )

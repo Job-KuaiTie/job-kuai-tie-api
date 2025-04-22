@@ -54,4 +54,4 @@ class JobCreate(JobBase):
 class JobUpdate(EntityUpdateMixin, JobBase):
     # When update, validate url and tier
     url: HttpUrl | None = None
-    tier: JobTier
+    tier: JobTier | None = None

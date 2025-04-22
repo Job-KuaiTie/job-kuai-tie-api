@@ -20,6 +20,7 @@ def create_company(
     db_company = Company(
         **company.model_dump(exclude_unset=True, exclude={"url"}),
         url=str(company.url) if company.url else None,
+        owner_id=current_account.id,
     )
     session.add(db_company)
     session.commit()

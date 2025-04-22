@@ -1,6 +1,6 @@
 from sqlmodel import Field, Relationship
 from .base import EntityBase, EntityMixin, EntityPublicMixin, EntityUpdateMixin
-from .mixin import ResourceBaseMixin
+from .mixin import ResourceBaseMixin, OwnershipMixin
 from datetime import datetime
 from .job_category import JobCategoryLink
 from typing import Optional
@@ -30,7 +30,7 @@ class JobBase(EntityBase, ResourceBaseMixin):
     )
 
 
-class Job(EntityMixin, JobBase, table=True):
+class Job(EntityMixin, JobBase, OwnershipMixin, table=True):
     # Owner relationship (One-to-Many): Account could own many jobs
     owner: Optional["Account"] = Relationship(back_populates="jobs")  # noqa: F821
     company: Optional["Company"] = Relationship(back_populates="jobs")  # noqa: F821
@@ -41,7 +41,7 @@ class Job(EntityMixin, JobBase, table=True):
     )
 
 
-class JobPublic(EntityPublicMixin, JobBase):
+class JobPublic(EntityPublicMixin, OwnershipMixin, JobBase):
     pass
 
 

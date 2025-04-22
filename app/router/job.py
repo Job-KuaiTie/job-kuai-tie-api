@@ -18,6 +18,7 @@ def create_job(job: JobCreate, session: SessionDep, current_account: CurrentAcco
     db_job = Job(
         **job.model_dump(exclude_unset=True, exclude={"url"}),
         url=str(job.url) if job.url else None,
+        owner_id=current_account.id,
     )
     session.add(db_job)
     session.commit()

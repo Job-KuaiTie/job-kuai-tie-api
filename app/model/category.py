@@ -1,6 +1,6 @@
 from sqlmodel import Relationship, Field
 from .base import EntityBase, EntityMixin, EntityPublicMixin, EntityUpdateMixin
-from .mixin import ResourceBaseMixin
+from .mixin import ResourceBaseMixin, OwnershipMixin
 from .job_category import JobCategoryLink
 from typing import Optional, Annotated
 from pydantic import StringConstraints
@@ -20,7 +20,7 @@ class CategoryBase(EntityBase, ResourceBaseMixin):
     color: str = Field(max_length=7)  # e.g., "#FF5733"
 
 
-class Category(EntityMixin, CategoryBase, table=True):
+class Category(EntityMixin, CategoryBase, OwnershipMixin, table=True):
     # Refer to owner
     owner: Optional["Account"] = Relationship(back_populates="categories")  # noqa: F821
 
@@ -30,7 +30,7 @@ class Category(EntityMixin, CategoryBase, table=True):
     )
 
 
-class CategoryPublic(EntityPublicMixin, CategoryBase):
+class CategoryPublic(EntityPublicMixin, CategoryBase, OwnershipMixin):
     pass
 
 

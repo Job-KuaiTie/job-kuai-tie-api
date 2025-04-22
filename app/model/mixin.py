@@ -1,10 +1,12 @@
 from sqlmodel import Field, SQLModel
 
 
-# Post
 class ResourceBaseMixin(SQLModel):
     description: str | None = None
 
+
+# ORM & Public
+class OwnershipMixin(SQLModel):
     # Owner relationship: Many-to-One
     owner_id: str = Field(
         index=True,

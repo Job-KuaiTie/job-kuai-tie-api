@@ -1,6 +1,6 @@
 from sqlmodel import Relationship
 from .base import EntityBase, EntityMixin, EntityPublicMixin, EntityUpdateMixin
-from .mixin import ResourceBaseMixin
+from .mixin import ResourceBaseMixin, OwnershipMixin
 from typing import Optional
 from pydantic import HttpUrl
 
@@ -10,7 +10,7 @@ class CompanyBase(EntityBase, ResourceBaseMixin):
     size: int | None = None
 
 
-class Company(EntityMixin, CompanyBase, table=True):
+class Company(EntityMixin, CompanyBase, OwnershipMixin, table=True):
     # Refer to owner
     owner: Optional["Account"] = Relationship(back_populates="companies")  # noqa: F821
 
@@ -18,7 +18,7 @@ class Company(EntityMixin, CompanyBase, table=True):
     jobs: list["Job"] = Relationship(back_populates="company")  # noqa: F821
 
 
-class CompanyPublic(EntityPublicMixin, CompanyBase):
+class CompanyPublic(EntityPublicMixin, CompanyBase, OwnershipMixin):
     pass
 
 

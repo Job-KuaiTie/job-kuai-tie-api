@@ -3,11 +3,10 @@ class TestCompany:
         name = "This is a chill company"
         url = "https://thisisachillcompany.com/"
         size = 20
-        owner_id = default_account.id
 
         response = client.post(
             "/companies/",
-            json={"name": name, "url": url, "size": size, "owner_id": owner_id},
+            json={"name": name, "url": url, "size": size},
             headers={"Authorization": f"Bearer {default_token}"},
         )
         assert response.status_code == 200
@@ -15,7 +14,6 @@ class TestCompany:
         assert data["name"] == name
         assert data["url"] == url
         assert data["size"] == size
-        assert data["owner_id"] == owner_id
         assert "id" in data
 
     def test_read_companies(self, client, default_token):
@@ -49,7 +47,7 @@ class TestCompany:
         # Act: Update it
         patch = client.patch(
             f"/companies/{company_id}",
-            json={"name": new_name, "owner_id": default_company.owner_id},
+            json={"name": new_name},
             headers={"Authorization": f"Bearer {default_token}"},
         )
         assert patch.status_code == 200

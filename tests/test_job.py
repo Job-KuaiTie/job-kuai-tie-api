@@ -3,11 +3,10 @@ class TestJob:
         name = "This is a chill job"
         tier = 1
         url = "https://thisisachilljob.com/"
-        owner_id = default_account.id
 
         response = client.post(
             "/jobs/",
-            json={"name": name, "tier": tier, "url": url, "owner_id": owner_id},
+            json={"name": name, "tier": tier, "url": url},
             headers={"Authorization": f"Bearer {default_token}"},
         )
         assert response.status_code == 200
@@ -15,17 +14,15 @@ class TestJob:
         assert data["name"] == name
         assert data["tier"] == tier
         assert data["url"] == url
-        assert data["owner_id"] == owner_id
         assert "id" in data
 
     def test_create_job_wihtou_tier(self, client, default_account, default_token):
         name = "This is another chill job"
         url = "https://thisisanotherchilljob.com/"
-        owner_id = default_account.id
 
         response = client.post(
             "/jobs/",
-            json={"name": name, "url": url, "owner_id": owner_id},
+            json={"name": name, "url": url},
             headers={"Authorization": f"Bearer {default_token}"},
         )
         # Should return 422 Unprocessable Entity as lack of tier
@@ -61,7 +58,7 @@ class TestJob:
         # Act: Update it
         patch = client.patch(
             f"/jobs/{job_id}",
-            json={"name": new_name, "owner_id": default_job.owner_id},
+            json={"name": new_name},
             headers={"Authorization": f"Bearer {default_token}"},
         )
         assert patch.status_code == 200

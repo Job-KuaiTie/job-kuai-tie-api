@@ -15,7 +15,10 @@ router = APIRouter(
 def create_category(
     category: CategoryCreate, session: SessionDep, current_account: CurrentAccountDep
 ):
-    db_category = Category.model_validate(category)
+    db_category = Category(
+        **category.model_dump(exclude_unset=True, exclude={"url"}),
+        owner_id=current_account.id,
+    )
     session.add(db_category)
     session.commit()
     session.refresh(db_category)

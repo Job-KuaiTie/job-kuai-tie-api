@@ -1,0 +1,27 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore test files
+tests/
+test_*.py
+
+
+# Ignore config files not needed in Docker image
+docker-compose.yml
+docker-compose.*.yml
+.pre-commit-config.yaml
+.env
+.gitignore
+
+# Ignore Git and local dev stuff
+.github/
+.git
+.vscode/
+*.log
+
+# Ignore database
+*.db
+
+# Ignore info
+README.md

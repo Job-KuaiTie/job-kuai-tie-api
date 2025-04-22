@@ -33,7 +33,12 @@ def read_jobs(
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 ) -> list[Job]:
-    jobs = session.exec(select(Job).offset(offset).limit(limit)).all()
+    jobs = session.exec(
+        select(Job)
+        .where(Job.owner_id == current_account.id)
+        .offset(offset)
+        .limit(limit)
+    ).all()
     return jobs
 
 
@@ -42,7 +47,7 @@ def read_job(
     job_id: str, session: SessionDep, current_account: CurrentAccountDep
 ) -> Job:
     job = session.get(Job, job_id)
-    if not job:
+    if not job or job.owner_id != current_account.id:
         raise HTTPException(status_code=404, detail="Job not found")
     return job
 
@@ -52,7 +57,7 @@ def update_job(
     job_id: str, job: JobUpdate, session: SessionDep, current_account: CurrentAccountDep
 ):
     job_db = session.get(Job, job_id)
-    if not job_db:
+    if not job_db or job_db.owner_id != current_account.id:
         raise HTTPException(status_code=404, detail="Job not found")
     job_data = job.model_dump(exclude_unset=True)
 
@@ -73,7 +78,7 @@ def update_job(
 @router.delete("/{job_id}")
 def delete_job(job_id: str, session: SessionDep, current_account: CurrentAccountDep):
     job = session.get(Job, job_id)
-    if not job:
+    if not job or job.owner_id != current_account.id:
         raise HTTPException(status_code=404, detail="Job not found")
     session.delete(job)
     session.commit()

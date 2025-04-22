@@ -1,3 +1,6 @@
+from tests.factory import create_account, create_job
+
+
 class TestJob:
     def test_create_job(self, client, default_account, default_token):
         name = "This is a chill job"
@@ -16,7 +19,7 @@ class TestJob:
         assert data["url"] == url
         assert "id" in data
 
-    def test_create_job_wihtou_tier(self, client, default_account, default_token):
+    def test_create_job_without_tier(self, client, default_account, default_token):
         name = "This is another chill job"
         url = "https://thisisanotherchilljob.com/"
 
@@ -47,6 +50,25 @@ class TestJob:
         # Assert: Check if the value as expected
         assert response.status_code == 200
         assert response.json()["name"] == default_job.name
+
+    def test_read_others_job(self, client, session, default_token):
+        # Arrange: Create another account
+        another_account = create_account(session)
+
+        # Arrange: Create another job belong to that account
+        another_job = create_job(another_account, session)
+
+        # Arrange: Get the job id
+        another_job_id = another_job.id
+
+        # Act: Read it back
+        response = client.get(
+            f"/jobs/{another_job_id}",
+            headers={"Authorization": f"Bearer {default_token}"},
+        )
+
+        # Assert: CHeck other's resource should be 404
+        assert response.status_code == 404
 
     def test_update_job(self, client, default_job, default_token):
         # Arrange: Get the job id

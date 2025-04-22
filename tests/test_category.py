@@ -1,3 +1,6 @@
+from tests.factory import create_account, create_category
+
+
 class TestCategory:
     def test_create_category(self, client, default_account, default_token):
         name = "This is a chill category"
@@ -47,6 +50,25 @@ class TestCategory:
         # Assert: Check if the value as expected
         assert response.status_code == 200
         assert response.json()["name"] == default_category.name
+
+    def test_read_others_category(self, client, session, default_token):
+        # Arrange: Create another account
+        another_account = create_account(session)
+
+        # Arrange: Create another category belong to that account
+        another_category = create_category(another_account, session)
+
+        # Arrange: Get the category id
+        another_category_id = another_category.id
+
+        # Act: Read it back
+        response = client.get(
+            f"/categories/{another_category_id}",
+            headers={"Authorization": f"Bearer {default_token}"},
+        )
+
+        # Assert: CHeck other's resource should be 404
+        assert response.status_code == 404
 
     def test_update_category(self, client, default_category, default_token):
         # Arrange: Get the category id

@@ -1,3 +1,6 @@
+from tests.factory import create_account, create_company
+
+
 class TestCompany:
     def test_create_company(self, client, default_account, default_token):
         name = "This is a chill company"
@@ -36,6 +39,25 @@ class TestCompany:
         # Assert: Check if the value as expected
         assert response.status_code == 200
         assert response.json()["name"] == default_company.name
+
+    def test_read_others_company(self, client, session, default_token):
+        # Arrange: Create another account
+        another_account = create_account(session)
+
+        # Arrange: Create another company belong to that account
+        another_company = create_company(another_account, session)
+
+        # Arrange: Get the company id
+        another_company_id = another_company.id
+
+        # Act: Read it back
+        response = client.get(
+            f"/companies/{another_company_id}",
+            headers={"Authorization": f"Bearer {default_token}"},
+        )
+
+        # Assert: CHeck other's resource should be 404
+        assert response.status_code == 404
 
     def test_update_company(self, client, default_company, default_token):
         # Arrange: Get the company id

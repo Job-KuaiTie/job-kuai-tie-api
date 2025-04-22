@@ -5,8 +5,8 @@ from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm  # OAuth2PasswordBearer
 from app.db import SessionDep
 
-from app.security import authenticate_account, get_current_account, create_access_token
-from app.model import Token, Account
+from app.security import authenticate_account, create_access_token
+from app.model import Token
 
 # to get a string like this run:
 # openssl rand -hex 32
@@ -36,19 +36,3 @@ async def login_for_access_token(
         data={"sub": account.id}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
-
-
-@router.get("/accounts/me/", response_model=Account)
-async def read_accounts_me(
-    current_account: Annotated[Account, Depends(get_current_account)],
-    session: SessionDep,
-):
-    return current_account
-
-
-@router.get("/accounts/me/items/")
-async def read_own_items(
-    current_account: Annotated[Account, Depends(get_current_account)],
-    session: SessionDep,
-):
-    return [{"item_id": "Foo", "owner": current_account.account_id}]

@@ -35,14 +35,21 @@ def read_companies(
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 ) -> list[Company]:
-    companies = session.exec(select(Company).offset(offset).limit(limit)).all()
+    companies = session.exec(
+        select(Company)
+        .where(Company.owner_id == current_account.id)
+        .offset(offset)
+        .limit(limit)
+    ).all()
     return companies
 
 
 @router.get("/{company_id}", response_model=CompanyPublic)
-def read_company(company_id: str, session: SessionDep) -> Company:
+def read_company(
+    company_id: str, session: SessionDep, current_account: CurrentAccountDep
+) -> Company:
     company = session.get(Company, company_id)
-    if not company:
+    if not company or company.owner_id != current_account.id:
         raise HTTPException(status_code=404, detail="Company not found")
     return company
 
@@ -55,7 +62,7 @@ def update_company(
     current_account: CurrentAccountDep,
 ):
     company_db = session.get(Company, company_id)
-    if not company_db:
+    if not company_db or company_db.owner_id != current_account.id:
         raise HTTPException(status_code=404, detail="Company not found")
     company_data = company.model_dump(exclude_unset=True)
 
@@ -78,7 +85,7 @@ def delete_company(
     company_id: str, session: SessionDep, current_account: CurrentAccountDep
 ):
     company = session.get(Company, company_id)
-    if not company:
+    if not company or company.owner_id != current_account.id:
         raise HTTPException(status_code=404, detail="Company not found")
     session.delete(company)
     session.commit()

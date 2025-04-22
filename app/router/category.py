@@ -32,7 +32,12 @@ def read_categories(
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 ) -> list[Category]:
-    categories = session.exec(select(Category).offset(offset).limit(limit)).all()
+    categories = session.exec(
+        select(Category)
+        .where(Category.owner_id == current_account.id)
+        .offset(offset)
+        .limit(limit)
+    ).all()
     return categories
 
 
@@ -41,7 +46,7 @@ def read_category(
     category_id: str, session: SessionDep, current_account: CurrentAccountDep
 ) -> Category:
     category = session.get(Category, category_id)
-    if not category:
+    if not category or category.owner_id != current_account.id:
         raise HTTPException(status_code=404, detail="Category not found")
     return category
 
@@ -54,7 +59,7 @@ def update_category(
     current_account: CurrentAccountDep,
 ):
     category_db = session.get(Category, category_id)
-    if not category_db:
+    if not category_db or category_db.owner_id != current_account.id:
         raise HTTPException(status_code=404, detail="Category not found")
     category_data = category.model_dump(exclude_unset=True)
 
@@ -77,7 +82,7 @@ def delete_category(
     category_id: str, session: SessionDep, current_account: CurrentAccountDep
 ):
     category = session.get(Category, category_id)
-    if not category:
+    if not category or category.owner_id != current_account.id:
         raise HTTPException(status_code=404, detail="Category not found")
     session.delete(category)
     session.commit()

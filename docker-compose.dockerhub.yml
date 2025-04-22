@@ -1,0 +1,23 @@
+services:
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpass
+      MARIADB_DATABASE: mydatabase
+      MARIADB_USER: myuser
+      MARIADB_PASSWORD: mypass
+    volumes:
+      - db_data:/var/lib/mysql
+  web:
+    image: river1440ce/fast-api-demo-104
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - .env.stage
+    ports:
+      - "8088:8088"
+
+volumes:
+  db_data:

@@ -32,6 +32,7 @@ if config.config_file_name is not None:
 
 # Even though SQLModel.metadata is the target
 # the models must be imported and registered in Python before Alembic runs autogenerate.
+from app import model  # noqa: E402, F401
 
 target_metadata = SQLModel.metadata
 

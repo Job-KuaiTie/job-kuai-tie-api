@@ -1,8 +1,8 @@
-"""Create Account, Job, Company, Category, JobCategoryLink
+"""Initial migration: With Account, Job, Company, Category and JObCategoryLink
 
-Revision ID: 3cee731ff0cc
+Revision ID: 31c1dad960d9
 Revises:
-Create Date: 2025-04-21 21:47:13.514085
+Create Date: 2025-04-22 11:04:43.837249
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 import sqlmodel
 
 # revision identifiers, used by Alembic.
-revision: str = "3cee731ff0cc"
+revision: str = "31c1dad960d9"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -88,8 +88,8 @@ def upgrade() -> None:
     op.create_index(op.f("ix_job_owner_id"), "job", ["owner_id"], unique=False)
     op.create_table(
         "jobcategorylink",
-        sa.Column("job_id", sa.Integer(), nullable=False),
-        sa.Column("category_id", sa.Integer(), nullable=False),
+        sa.Column("job_id", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+        sa.Column("category_id", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
         sa.ForeignKeyConstraint(["category_id"], ["category.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["job_id"], ["job.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("job_id", "category_id"),

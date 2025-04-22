@@ -1,5 +1,5 @@
 class TestCategory:
-    def test_create_category(self, client, default_account):
+    def test_create_category(self, client, default_account, default_token):
         name = "This is a chill category"
         color = "#FFFFFF"
         owner_id = default_account.id
@@ -7,6 +7,7 @@ class TestCategory:
         response = client.post(
             "/categories/",
             json={"name": name, "color": color, "owner_id": owner_id},
+            headers={"Authorization": f"Bearer {default_token}"},
         )
         assert response.status_code == 200
         data = response.json()
@@ -15,34 +16,42 @@ class TestCategory:
         assert data["owner_id"] == owner_id
         assert "id" in data
 
-    def test_create_category_wihtou_color(self, client, default_account):
+    def test_create_category_without_color(
+        self, client, default_account, default_token
+    ):
         name = "This is another chill category"
         owner_id = default_account.id
 
         response = client.post(
             "/categories/",
             json={"name": name, "owner_id": owner_id},
+            headers={"Authorization": f"Bearer {default_token}"},
         )
         # Should return 422 Unprocessable Entity as lack of tier
         assert response.status_code == 422
 
-    def test_read_categories(self, client):
-        response = client.get("/categories/")
+    def test_read_categories(self, client, default_token):
+        response = client.get(
+            "/categories/", headers={"Authorization": f"Bearer {default_token}"}
+        )
         assert response.status_code == 200
         assert isinstance(response.json(), list)
 
-    def test_read_category(self, client, default_category):
+    def test_read_category(self, client, default_category, default_token):
         # Arrange: Get the category id
         category_id = default_category.id
 
         # Act: Read it back
-        response = client.get(f"/categories/{category_id}")
+        response = client.get(
+            f"/categories/{category_id}",
+            headers={"Authorization": f"Bearer {default_token}"},
+        )
 
         # Assert: Check if the value as expected
         assert response.status_code == 200
         assert response.json()["name"] == default_category.name
 
-    def test_update_category(self, client, default_category):
+    def test_update_category(self, client, default_category, default_token):
         # Arrange: Get the category id
         category_id = default_category.id
 
@@ -53,19 +62,26 @@ class TestCategory:
         patch = client.patch(
             f"/categories/{category_id}",
             json={"name": new_name, "owner_id": default_category.owner_id},
+            headers={"Authorization": f"Bearer {default_token}"},
         )
         assert patch.status_code == 200
         assert patch.json()["name"] == new_name
 
-    def test_delete_category(self, client, default_category):
+    def test_delete_category(self, client, default_category, default_token):
         # Arrange: Get the category id
         category_id = default_category.id
 
         # Act: Delete it
-        delete = client.delete(f"/categories/{category_id}")
+        delete = client.delete(
+            f"/categories/{category_id}",
+            headers={"Authorization": f"Bearer {default_token}"},
+        )
         assert delete.status_code == 200
         assert delete.json() == {"ok": True}
 
         # Assert: Check again
-        get = client.get(f"/categories/{category_id}")
+        get = client.get(
+            f"/categories/{category_id}",
+            headers={"Authorization": f"Bearer {default_token}"},
+        )
         assert get.status_code == 404

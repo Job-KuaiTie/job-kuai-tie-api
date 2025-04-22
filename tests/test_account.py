@@ -32,43 +32,44 @@ class TestAccount:
         # Assert: It should fails with 404
         assert response.status_code == 404
 
-    def test_read_accounts(self, client):
-        response = client.get("/accounts/")
-        assert response.status_code == 200
-        assert isinstance(response.json(), list)
+    # def test_read_accounts(self, client):
+    #     response = client.get("/accounts/")
+    #     assert response.status_code == 200
+    #     assert isinstance(response.json(), list)
 
-    def test_read_account(self, client, default_account):
-        # Arrange: Get the account id
-        account_id = default_account.id
-
+    def test_read_my_account(self, client, default_account, default_token):
         # Act: Read it back
-        response = client.get(f"/accounts/{account_id}")
+        response = client.get(
+            "/accounts/me", headers={"Authorization": f"Bearer {default_token}"}
+        )
 
         # Assert: Check if the value as expected
         assert response.status_code == 200
         assert response.json()["name"] == default_account.name
 
-    def test_update_account(self, client, default_account):
-        # Arrange: Get the account id
-        account_id = default_account.id
-
+    def test_update_my_account(self, client, default_token):
         # Arrange: Set new name
         new_name = "This is new name"
 
         # Act: Update it
-        patch = client.patch(f"/accounts/{account_id}", json={"name": new_name})
+        patch = client.patch(
+            "/accounts/me",
+            json={"name": new_name},
+            headers={"Authorization": f"Bearer {default_token}"},
+        )
         assert patch.status_code == 200
         assert patch.json()["name"] == new_name
 
-    def test_delete_account(self, client, default_account):
-        # Arrange: Get the account id
-        account_id = default_account.id
-
+    def test_delete_my_account(self, client, default_account, default_token):
         # Act: Delete it
-        delete = client.delete(f"/accounts/{account_id}")
+        delete = client.delete(
+            "/accounts/me", headers={"Authorization": f"Bearer {default_token}"}
+        )
         assert delete.status_code == 200
         assert delete.json() == {"ok": True}
 
-        # Assert: Check again
-        get = client.get(f"/accounts/{account_id}")
-        assert get.status_code == 404
+        # Assert: Deleted account would raise 401 as token expired
+        get = client.get(
+            "/accounts/me", headers={"Authorization": f"Bearer {default_token}"}
+        )
+        assert get.status_code == 401

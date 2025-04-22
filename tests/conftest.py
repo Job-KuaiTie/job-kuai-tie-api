@@ -5,7 +5,19 @@ from app.main import app
 from app.db import get_session
 from app.model import Account
 import pytest
-from tests.factory import AccountFactory, CompanyFactory, JobFactory, CategoryFactory
+from faker import Faker
+
+
+from tests.factory import (
+    AccountCreateFactory,
+    CompanyFactory,
+    JobFactory,
+    CategoryFactory,
+)
+from app.security import hash_password
+
+
+fake = Faker()
 
 
 @pytest.fixture(name="session")
@@ -30,15 +42,63 @@ def client(session: Session):
     app.dependency_overrides.clear()
 
 
+# @pytest.fixture(scope="function")
+# def default_account(session: Session):
+#     account = AccountFactory()
+
+#     session.add(account)
+#     session.commit()
+#     session.refresh(account)
+
+#     yield account
+
+# @pytest.fixture(scope="function")
+# def default_created_account(session: Session):
+#     account = AccountCreateFactory()
+
+#     db_account = Account(
+#         name=account.name,
+#         email=account.email,
+#         password_hash=hash_password(account.password),
+#     )
+
+#     session.add(db_account)
+#     session.commit()
+
+#     yield account
+
+
 @pytest.fixture(scope="function")
-def default_account(session: Session):
-    account = AccountFactory()
+def default_password():
+    yield fake.password(length=12)
 
-    session.add(account)
+
+@pytest.fixture(scope="function")
+def default_account(session: Session, default_password):
+    account = AccountCreateFactory(password=default_password)
+
+    db_account = Account(
+        name=account.name,
+        email=account.email,
+        password_hash=hash_password(account.password),
+    )
+
+    session.add(db_account)
     session.commit()
-    session.refresh(account)
+    session.refresh(db_account)
 
-    yield account
+    yield db_account
+
+
+@pytest.fixture(scope="function")
+def default_token(client, default_password, default_account):
+    # Get the token by client
+    response = client.post(
+        "/token/",
+        data={"username": default_account.email, "password": default_password},
+    )
+    # Return the token
+    return response.json()["access_token"]
 
 
 @pytest.fixture(scope="function")

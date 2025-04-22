@@ -1,6 +1,7 @@
 import factory
 from app.model import (
     Account,
+    AccountCreate,
     Company,
     Job,
     Category,
@@ -38,6 +39,16 @@ class AccountFactory(EntityFactory, factory.Factory):
     def password_hash(self):
         password_hash = hash_password(fake.password(length=12))
         return password_hash
+
+
+class AccountCreateFactory(EntityFactory, factory.Factory):
+    """Factory for Account"""
+
+    class Meta:
+        model = AccountCreate
+
+    email = factory.Faker("email")
+    password = factory.Faker("password", length=12)
 
 
 class ResourceFactory(EntityFactory, factory.Factory):

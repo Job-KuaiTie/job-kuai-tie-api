@@ -55,3 +55,6 @@ async def get_current_account(
     if account is None:
         raise credentials_exception
     return account
+
+
+CurrentAccountDep = Annotated[Account, Depends(get_current_account)]

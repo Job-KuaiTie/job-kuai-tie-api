@@ -4,10 +4,13 @@ from sqlmodel import select
 from app.db import SessionDep
 from app.model import Company, CompanyCreate, CompanyPublic, CompanyUpdate
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/companies",
+    tags=["companies"],
+)
 
 
-@router.post("/companies/", response_model=CompanyPublic)
+@router.post("/", response_model=CompanyPublic)
 def create_company(company: CompanyCreate, session: SessionDep):
     # HttpUrl would failed here
     # db_company = Company.model_validate(company)
@@ -21,7 +24,7 @@ def create_company(company: CompanyCreate, session: SessionDep):
     return db_company
 
 
-@router.get("/companies/", response_model=list[CompanyPublic])
+@router.get("/", response_model=list[CompanyPublic])
 def read_companies(
     session: SessionDep,
     offset: int = 0,
@@ -31,7 +34,7 @@ def read_companies(
     return companies
 
 
-@router.get("/companies/{company_id}", response_model=CompanyPublic)
+@router.get("/{company_id}", response_model=CompanyPublic)
 def read_company(company_id: str, session: SessionDep) -> Company:
     company = session.get(Company, company_id)
     if not company:
@@ -39,7 +42,7 @@ def read_company(company_id: str, session: SessionDep) -> Company:
     return company
 
 
-@router.patch("/companies/{company_id}", response_model=CompanyPublic)
+@router.patch("/{company_id}", response_model=CompanyPublic)
 def update_company(company_id: str, company: CompanyUpdate, session: SessionDep):
     company_db = session.get(Company, company_id)
     if not company_db:
@@ -60,7 +63,7 @@ def update_company(company_id: str, company: CompanyUpdate, session: SessionDep)
     return company_db
 
 
-@router.delete("/companies/{company_id}")
+@router.delete("/{company_id}")
 def delete_company(company_id: str, session: SessionDep):
     company = session.get(Company, company_id)
     if not company:

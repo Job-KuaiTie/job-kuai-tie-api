@@ -18,8 +18,8 @@ class TestJob:
         assert "id" in data
 
     def test_create_job_wihtou_tier(self, client, default_account):
-        name = "This is a chill job"
-        url = "https://thisisachilljob.com/"
+        name = "This is another chill job"
+        url = "https://thisisanotherchilljob.com/"
         owner_id = default_account.id
 
         response = client.post(

@@ -4,10 +4,13 @@ from sqlmodel import select
 from app.db import SessionDep
 from app.model import Job, JobCreate, JobPublic, JobUpdate
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/jobs",
+    tags=["jobs"],
+)
 
 
-@router.post("/jobs/", response_model=JobPublic)
+@router.post("/", response_model=JobPublic)
 def create_job(job: JobCreate, session: SessionDep):
     # HttpUrl would failed here
     # db_job = Job.model_validate(job)
@@ -21,7 +24,7 @@ def create_job(job: JobCreate, session: SessionDep):
     return db_job
 
 
-@router.get("/jobs/", response_model=list[JobPublic])
+@router.get("/", response_model=list[JobPublic])
 def read_jobs(
     session: SessionDep,
     offset: int = 0,
@@ -31,7 +34,7 @@ def read_jobs(
     return jobs
 
 
-@router.get("/jobs/{job_id}", response_model=JobPublic)
+@router.get("/{job_id}", response_model=JobPublic)
 def read_job(job_id: str, session: SessionDep) -> Job:
     job = session.get(Job, job_id)
     if not job:
@@ -39,7 +42,7 @@ def read_job(job_id: str, session: SessionDep) -> Job:
     return job
 
 
-@router.patch("/jobs/{job_id}", response_model=JobPublic)
+@router.patch("/{job_id}", response_model=JobPublic)
 def update_job(job_id: str, job: JobUpdate, session: SessionDep):
     job_db = session.get(Job, job_id)
     if not job_db:
@@ -60,7 +63,7 @@ def update_job(job_id: str, job: JobUpdate, session: SessionDep):
     return job_db
 
 
-@router.delete("/jobs/{job_id}")
+@router.delete("/{job_id}")
 def delete_job(job_id: str, session: SessionDep):
     job = session.get(Job, job_id)
     if not job:

@@ -10,7 +10,13 @@ connect_args = {}
 if settings.db_type == "sqlite":
     connect_args = {"check_same_thread": False}
 
-engine = create_engine(settings.db_url, connect_args=connect_args)
+engine = create_engine(
+    settings.db_url,
+    connect_args=connect_args,
+    pool_size=2,
+    max_overflow=0,
+    pool_recycle=280,
+)
 
 
 def get_session():

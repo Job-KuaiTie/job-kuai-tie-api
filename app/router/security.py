@@ -3,12 +3,11 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm  # OAuth2PasswordBearer
-from app.db import SessionDep
 
+from app.db import SessionDep
 from app.security import authenticate_account, create_access_token
 from app.model import Token
-
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+from app.config import settings
 
 router = APIRouter(tags=["security"])
 
@@ -27,7 +26,7 @@ async def login_for_access_token(
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
         data={"sub": account.id}, expires_delta=access_token_expires
     )

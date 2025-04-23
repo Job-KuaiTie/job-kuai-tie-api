@@ -72,7 +72,11 @@ def update_company(
     # company_db.sqlmodel_update(company_data)
 
     for key, value in company_data.items():
-        setattr(company_db, key, value)
+        if key == "url":
+            url = str(value) if value else None
+            setattr(company_db, key, url)
+        else:
+            setattr(company_db, key, value)
 
     session.add(company_db)
     session.commit()

@@ -26,6 +26,8 @@ class Settings(BaseSettings):
             # Only support mysql now
             if self.db_type == "mysql":
                 return f"mysql+pymysql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+            if self.db_type == "postgresql":
+                return f"postgresql+psycopg2://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
         # If directly provide db_url
         elif self.database_url:
             return self.database_url

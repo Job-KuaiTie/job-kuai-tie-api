@@ -15,7 +15,8 @@ engine = create_engine(
     connect_args=connect_args,
     pool_size=2,
     max_overflow=0,
-    pool_recycle=280,
+    pool_recycle=1800,
+    pool_pre_ping=True,
 )
 
 

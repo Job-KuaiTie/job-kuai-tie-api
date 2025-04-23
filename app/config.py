@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     db_user: Optional[str] = Field(default=None, alias="DB_USER")
     db_password: Optional[str] = Field(default=None, alias="DB_PASSWORD")
     db_host: Optional[str] = Field(default=None, alias="DB_HOST")
-    db_port: Optional[int] = Field(default=3306, alias="DB_PORT")
+    db_port: Optional[int] = Field(default=None, alias="DB_PORT")
     db_name: Optional[str] = Field(default=None, alias="DB_NAME")
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

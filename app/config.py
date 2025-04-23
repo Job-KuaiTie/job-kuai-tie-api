@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     secret_key: str = Field(alias="SECRET_KEY")
     database_url: Optional[str] = Field(default=None, alias="DB_URL")
     algorithm: Optional[str] = Field(default="HS256", alias="ALGORITHM")
+    access_token_expire_minutes: Optional[int] = Field(
+        default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
+    )
 
     db_type: str = Field(default="sqlite", alias="DB_TYPE")
     db_user: Optional[str] = Field(default=None, alias="DB_USER")

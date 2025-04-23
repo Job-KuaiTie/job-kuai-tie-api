@@ -23,11 +23,13 @@ class Settings(BaseSettings):
     def db_url(self):
         # If provide database variables
         if self.db_user and self.db_password and self.db_host and self.db_name:
-            # Only support mysql now
+            port_part = f":{self.db_port}" if self.db_port else ""
+
             if self.db_type == "mysql":
-                return f"mysql+pymysql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+                return f"mysql+pymysql://{self.db_user}:{self.db_password}@{self.db_host}{port_part}/{self.db_name}"
+
             if self.db_type == "postgresql":
-                return f"postgresql+psycopg2://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+                return f"postgresql+psycopg2://{self.db_user}:{self.db_password}@{self.db_host}{port_part}/{self.db_name}"
         # If directly provide db_url
         elif self.database_url:
             return self.database_url
